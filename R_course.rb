@@ -1,4 +1,3 @@
-
 #####################################################################################
 #
 #     Rコース用
@@ -7,7 +6,7 @@
 
 include EV3RT_TECS
 
-# センサー・モーターのポート設定
+# ポート番号の設定
 TOUCH_SENSOR = :port_1
 COLOR_SENSOR = :port_3
 GYRO_SENSOR  = :port_4
@@ -30,30 +29,30 @@ PWM_ABS_MAX = 60          # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽS??ｿ�
 # PID制御に関わる定数をセット
 # 周期を設定
 PERIOD = 0.004
-#PDI制御(フィードバック制御)初期値
-KP = 1.7	#比例ゲイン初期値
-KI = 0		#積分ゲイン初期値
-KD = 0.23	#微分ゲイン初期値
+
+KP = 1.7
+KI = 0
+KD = 0.23
 
 iremono = [
   #0.21
-# => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]	-：黒寄り
+# => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]
     [    0, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 1streat
     [ 1000, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 1streat
     [ 6000, 1, 1,0.996,0.139,0.034,  75, -5,  -5], # 1carb
     [ 15200, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 2streat
     [15500, 1, 1,0.996,0.162, 0.04,  80,  0,  -5], # 2streat
-    [20000, 1, 1,  0.996,0.176,0.044,  100, -5,  -5], # 2carb_1
-    [24000, 1, 1, 0.126,0.225,0.056,  100,  0,  -5], # 2carb_mid
-    [29000, 1, 1, 0.996,0.176,0.044,  55, -5,  -5], # 2carb_2
-    [33000, 1, 1,0.126,0.162, 0.04,  100,  5,  -5], # 3streat
-    [45000, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 3streat
+    [20000, 1, 1,  0.996,0.176,0.044,  80, -5,  -5], # 2carb_1
+    [24000, 1, 1, 0.126,0.162,0.04,  100,  0,  -5], # 2carb_mid
+    [29600, 1, 1, 0.996,0.176,0.044,  55, -5,  -5], # 2carb_2
+    [35000, 1, 1,0.126,0.162, 0.04,  100, 0,  -5], # 3streat
+   # [45000, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 3streat
     # [15100, 1, 1,0.126,0.162, 0.04, 100,  5,  4], # test_3streat_start
     # [16000, 1, 1,0.126,0.162, 0.04, 100,  5,  8], # test_3streat
     [45000, 1, 1, 0.126, 0.17,0.042,  100,  3,  -5], # 3carb
     # [18600, 1, 1,  1.7,    1, 0.22,  50,  3,  0], # 3carb_old
-    [47000, 1, 1,0.126,0.162, 0.04,  100, -3,  -5], # 4streat_goal
-    [49000, 1, 1,0.126,0.162, 0.04,  100,  0,  -5], # 4streat
+    #[47000, 1, 1,0.126,0.162, 0.04,  100, -3,  -5], # 4streat_goal
+    #[49000, 1, 1,0.126,0.162, 0.04,  100,  0,  -5], # 4streat
     # [22000, 1, 1,  1.7,    0,    0,  15, -3,  0], # 4streat_old
     [999999] #end
 ]
@@ -160,7 +159,7 @@ begin
     tail_plus = 0
     flag = 0
     pidchange = 0
-
+pidflag = -1 #kobayashi
     lap = 0
     lap_diff = 0
     lap_start = 0
@@ -207,7 +206,6 @@ begin
     $motor_t.reset_count
 
     # ??ｿｽ?ｿｽX??ｿｽ?ｿｽ^??ｿｽ?ｿｽ[??ｿｽ?ｿｽg??ｿｽ?ｿｽﾒ機
-    LCD.puts "Ready to start"
     loop {
         # 完全停止用角度に制御
         tail_control(TAIL_ANGLE_STAND_UP + 3)
@@ -222,11 +220,72 @@ begin
             puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
             RTOS.delay(200)
         end
+	# タッチセンサが押されるまで待つ
+        break if $touch.pressed?
+        RTOS.delay(10)
+    }
+
+		TAIL_ANGLE_DRIVE = TAIL_ANGLE_STAND_UP - 88 
+    gate_tail_stand_up = TAIL_ANGLE_STAND_UP - 30 #ゲートをくぐる角度なんじゃ
+    RTOS.delay(500)
+    Speaker.tone(:a4, 200)
+########ゲートをくぐるときのカラー#####################################################
+    #$motor_t.rotate(58, 20, true)
+		
+    loop {
+    		tail_control(gate_tail_stand_up)
+        break if $touch.pressed?
+        RTOS.delay(10)
+    }
+    tail_black  = $color.reflect
+    puts "tail_black = #{tail_black}"
+    Speaker.tone(:a4, 200)
+    RTOS.delay(500)
+
+    loop {
+    		tail_control(gate_tail_stand_up)
+        break if $touch.pressed?
+        RTOS.delay(10)
+    }
+    tail_white  = $color.reflect
+    puts "tail_white = #{tail_white}"
+    Speaker.tone(:a4, 200)
+    RTOS.delay(500)
+
+		
+    loop {
+    		tail_control(TAIL_ANGLE_DRIVE)
+        # タッチセンサが押されるまで待つ
+        break if $touch.pressed?
+        RTOS.delay(10)
+    }
+    Speaker.tone(:a4, 200)
+    RTOS.delay(500)
+
+    # スタート待機
+    LCD.puts "Ready to start"
+    loop {
+        # 完全停止用角度に制御
+
+        tail_control(TAIL_ANGLE_STAND_UP)
+=begin
+        #TAIL微調整
+        if Button[:up  ].pressed?
+            TAIL_ANGLE_STAND_UP += 1
+            puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
+            RTOS.delay(200)
+        end
+        if Button[:down].pressed?
+            TAIL_ANGLE_STAND_UP -= 1
+            puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
+            RTOS.delay(200)
+        end
+=end
         eeee = $color.reflect
         if (threshold - 3 < eeee) && (threshold + 3 > eeee)
           Speaker.tone(:e4, 200)
         end
-				# タッチセンサが押されるまで待つ
+        # タッチセンサが押されるまで待つ
         break if $touch.pressed?
         RTOS.delay(10)
     }
@@ -581,6 +640,218 @@ begin
 
 
         tail_control(tail)
+
+#------------------------------ここからゲート------------------------------------------------------------------------
+	if pidflag == 6 && distance <= 25 && distance > 0 #ゲートに近づいたとき
+			
+			left_m = 1
+			right_m = 1
+
+			lap_diff = RTOS.msec - lap_start - lap
+			lap = RTOS.msec - lap_start
+
+		KP = 0.3
+		KI = 0.1 
+		KD = 0.02
+
+  		speed = 6
+				
+      if distance <= 20 && distance > 0 #ゲートにめっちゃ近づいたとき
+          puts "in flag6"
+  			  pidflag = 7
+					puts "start_motor = #{$motor_t.count}"
+					mtc = $motor_t.count
+					Speaker.tone(:e4, 400)
+							
+					$motor_r.rotate(60, 10, false)
+					$motor_l.rotate(60, 10, false)
+					#$motor_t.rotate(58, 15, true)
+					$motor_t.rotate(70, 15, true)#65-10
+					RTOS.delay(1000)
+					$motor_t.rotate(-6, 15, true)#2段階で尻尾を下げ
+					RTOS.delay(1000)
+					$motor_t.rotate(-6, 15, true)#2段階で尻尾を下げ
+					RTOS.delay(1000)
+
+
+					puts "end_motor = #{$motor_t.count}"
+
+					loop{
+						$motor_t.rotate( gate_tail_stand_up - $motor_t.count , 3, false)
+						RTOS.delay(200)
+						$motor_r.rotate( 2, 35, false)
+						$motor_l.rotate( 2, 35, true) 
+						RTOS.delay(200)
+						$motor_r.rotate( -2, 35, false)
+						$motor_l.rotate( -2, 35, true) 
+						# puts "調整のtail_motor_count = #{$motor_t.count}"
+						break if $motor_t.count == gate_tail_stand_up
+					}
+
+					RTOS.delay(1000)
+
+					gate_motor_power_a = 1
+					gate_motor_power_b = 8
+					
+					tail_flag = 0
+					plus_rotate = 0
+					loop{
+							start = RTOS.msec
+							distance = $sonar.distance
+					
+							puts "color = #{$color.reflect}"
+							# puts "distance = #{distance}"
+							#puts "c = #{c}"
+							
+							if $color.reflect >= tail_white - 2  #白の時と白以外の時
+								$motor_l.power = gate_motor_power_a #2 -> 5 -> 2
+								$motor_r.power = gate_motor_power_b #5 -> 2 -> 5
+							else
+								$motor_l.power = gate_motor_power_b
+								$motor_r.power = gate_motor_power_a
+							end
+
+
+							if 	distance >= 130 && tail_flag == 0 #近くに行った後、ゲートをくぐったか確認する処理 現在130
+								c = c + 1
+	 						else
+								c = 0
+							end
+							
+							if distance <= 50 && distance > 0 && tail_flag == 1 
+								Speaker.tone(:a4, 200)
+								tail_flag = 0
+							end
+							
+							if c == 2500 #時間決め
+								$motor_l.stop
+								$motor_r.stop
+								RTOS.delay(1500)
+								
+								if gate_c == 2 #２回カウントしたらブレイク
+									$motor_l.reset_count
+									$motor_r.reset_count
+									Speaker.tone(:b4, 500)
+									c = 0
+        		  		break
+        		  	end
+
+=begin        		  						
+								$motor_l.power = -1
+								$motor_r.power = -1
+								$motor_t.rotate(10, 1, true) #回転するために機体を上げる処理
+								$motor_l.stop
+								$motor_r.stop
+=end
+								loop{
+									$motor_t.rotate( gate_tail_stand_up + 10 - $motor_t.count , 3, false)
+									$motor_r.rotate( -1, 40, false)
+									$motor_l.rotate( -1, 40, true) 
+									RTOS.delay(100)
+									$motor_r.rotate( 1, 40, false)
+									$motor_l.rotate( 1, 40, true) 
+									RTOS.delay(100)
+									# puts "調整のtail_motor_count = #{$motor_t.count}"
+									break if $motor_t.count == gate_tail_stand_up + 10
+								}
+								
+								
+								RTOS.delay(500)
+								$motor_l.rotate(330 + plus_rotate , 15, false)#反転する処理
+								$motor_r.rotate(-330 - plus_rotate , 15, true)
+								RTOS.delay(500)
+
+								plus_rotate  = 30
+
+								loop{
+									$motor_t.rotate( gate_tail_stand_up - $motor_t.count , 3, false)
+									$motor_r.rotate( -1, 40, false)
+									$motor_l.rotate( -1, 40, true) 
+									RTOS.delay(100)
+									$motor_r.rotate( 1, 40, false)
+									$motor_l.rotate( 1, 40, true) 
+									RTOS.delay(100)
+									puts "調整のtail_motor_count = #{$motor_t.count}"
+									break if $motor_t.count == gate_tail_stand_up  
+								}
+
+								RTOS.delay(1000)
+									
+								c = 0
+								
+								tail_flag = 1
+								gate_c = gate_c + 1
+
+								gate_motor_power_a , gate_motor_power_b = gate_motor_power_b , gate_motor_power_a 
+
+								puts "tail_white = #{tail_white}"
+							end
+
+    		  
+					}
+
+					parking_count = 1100 #ゲート終了からガレージまでの距離
+					stand_up_flag = 1
+
+					loop{ #最後の駐車場に行く処理
+						if $color.reflect >= tail_white - 5
+								$motor_l.power = gate_motor_power_a #2 -> 5 -> 2
+								$motor_r.power = gate_motor_power_b #5 -> 2 -> 5
+							else
+								$motor_l.power = gate_motor_power_b
+								$motor_r.power = gate_motor_power_a
+							end
+						
+						motor_w_count = $motor_l.count + $motor_r.count
+
+					
+						if motor_w_count >= parking_count
+							$motor_l.stop
+							$motor_r.stop
+        			
+        			
+
+							if stand_up_flag == 1
+=begin
+								$motor_l.power = -1
+								$motor_r.power = -1
+								$motor_t.rotate(10, 1, true) #回転するために機体を上げる処理
+								$motor_l.stop
+								$motor_r.stop
+=end
+								loop{
+									$motor_t.rotate( gate_tail_stand_up + 10 - $motor_t.count , 3, false)
+									$motor_r.rotate( -1, 35, false)
+									$motor_l.rotate( -1, 35, true) 
+									RTOS.delay(100)
+									$motor_r.rotate( 1, 35, false)
+									$motor_l.rotate( 1, 35, true) 
+									RTOS.delay(100)
+									puts "調整のtail_motor_count = #{$motor_t.count}"
+									break if $motor_t.count == gate_tail_stand_up + 10
+								}
+								stand_up_flag = 0
+							end
+							
+
+							RTOS.delay(6000)
+
+
+
+        			$motor_l.reset_count
+							$motor_r.reset_count
+        			parking_count = 100
+
+
+							break if $touch.pressed?
+
+						end
+					}
+					
+        end
+      #end
+
+end
 
 #-----------------------------------------------------------------------
 
