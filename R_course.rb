@@ -37,19 +37,19 @@ KD = 0.23
 iremono = [
   #0.21
 # => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]
-    [    0, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 1streat
-    [ 1000, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 1streat
-    [ 6000, 1, 1,0.996,0.139,0.034,  75, -5,  -5], # 1carb
-    [ 15200, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 2streat
-    [15500, 1, 1,0.996,0.162, 0.04,  80,  0,  -5], # 2streat
-    [20000, 1, 1,  0.996,0.176,0.044,  80, -5,  -5], # 2carb_1
-    [24000, 1, 1, 0.126,0.162,0.04,  100,  0,  -5], # 2carb_mid
-    [29600, 1, 1, 0.996,0.176,0.044,  55, -5,  -5], # 2carb_2
-    [35000, 1, 1,0.126,0.162, 0.04,  100, 0,  -5], # 3streat
+    [    0, 1, 1,0.126,0.162, 0.04, 100,  0,  -3], # 1streat
+    [ 1000, 1, 1,0.126,0.162, 0.04, 100,  0,  -3], # 1streat
+    [ 6000, 1, 1,0.996,0.176,0.044,  100, 7,  -5], # 1carb
+    #[ 15200, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 2streat
+    [15500, 1, 1,0.996,0.176, 0.044,  80,  -6,  -7], # 2carb
+    [20000, 1, 1,  0.996,0.176,0.044,  70, 0,  -7], # 2carb_1
+    [24000, 1, 1, 0.126,0.162,0.04,  100,  0,  -3], # 2streat
+    [29600, 1, 1, 0.996,0.176,0.044,  50, -5,  -5], # 3carb
+    [33000, 1, 1,0.126,0.162, 0.04,  25, 0,  -5], # gate
    # [45000, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 3streat
     # [15100, 1, 1,0.126,0.162, 0.04, 100,  5,  4], # test_3streat_start
     # [16000, 1, 1,0.126,0.162, 0.04, 100,  5,  8], # test_3streat
-    [45000, 1, 1, 0.126, 0.17,0.042,  100,  3,  -5], # 3carb
+   # [38000, 1, 1, 0.126, 0.17,0.042,  100,  3,  -5], # 3carb
     # [18600, 1, 1,  1.7,    1, 0.22,  50,  3,  0], # 3carb_old
     #[47000, 1, 1,0.126,0.162, 0.04,  100, -3,  -5], # 4streat_goal
     #[49000, 1, 1,0.126,0.162, 0.04,  100,  0,  -5], # 4streat
@@ -123,9 +123,9 @@ end
 #*****************************************************************************
 def pidcash_reset
     Speaker.tone(:c4, 400)
-    $diff[0] = 0
-    $diff[1] = 0
-    $integral = 0
+    #$diff[0] = 0
+    #$diff[1] = 0
+    #$integral = 0
 end
 #mainプログラム
 begin
@@ -136,7 +136,7 @@ begin
     LCD.puts "--- mruby version ---"
     Speaker.volume = 1
     # 各オブジェクトを生成・初期化する
-  #  $sonar = UltrasonicSensor.new(SONAR_SENSOR)
+    $sonar = UltrasonicSensor.new(SONAR_SENSOR)
     $color = ColorSensor.new(COLOR_SENSOR)
     $color.reflect
     $touch = TouchSensor.new(TOUCH_SENSOR)
@@ -160,6 +160,8 @@ begin
     flag = 0
     pidchange = 0
 pidflag = -1 #kobayashi
+distance = 1 #kobayashi
+gate_c = 0 #kobayashi
     lap = 0
     lap_diff = 0
     lap_start = 0
@@ -226,7 +228,7 @@ pidflag = -1 #kobayashi
     }
 
 		TAIL_ANGLE_DRIVE = TAIL_ANGLE_STAND_UP - 88 
-    gate_tail_stand_up = TAIL_ANGLE_STAND_UP - 30 #ゲートをくぐる角度なんじゃ
+    gate_tail_stand_up = TAIL_ANGLE_STAND_UP - 26 #ゲートをくぐる角度なんじゃ
     RTOS.delay(500)
     Speaker.tone(:a4, 200)
 ########ゲートをくぐるときのカラー#####################################################
@@ -303,7 +305,7 @@ pidflag = -1 #kobayashi
     # LED:緑 走行状態
     LED.color = :green
 
-
+=begin
     loop {
         start = RTOS.msec
         g = $gyro.rate.to_f
@@ -316,13 +318,34 @@ pidflag = -1 #kobayashi
         RTOS.delay(wait) if wait > 0
     }
 
+=end
+	loop {
+    	ss_flg = 0
+	    loop {
+	        start = RTOS.msec
+	        g = $gyro.rate.to_f
+	        if g < 0
+	        	ss_flg += 1
+	        	tc+=1
+	        end
+	        tail_control(TAIL_ANGLE_STAND_UP + tc)
+	        puts "g = #{g}"
+	        puts "tc = #{tc}"
+	        ss_flg = 10 if g >= 8 #65
+	        break if ss_flg >= 10 #65
 
+	        #RTOS.delay(10)
+	        wait = 4 - (RTOS.msec - start)
+	        RTOS.delay(wait) if wait > 0
+	    	}
+	        break if ss_flg >= 10 #65
+	    }
     Speaker.volume = 20
     loop{
         start = RTOS.msec
         # ??ｿｽ?ｿｽo??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽX??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽs??ｿｽ?ｿｽp??ｿｽ?ｿｽp??ｿｽ?ｿｽx??ｿｽ?ｿｽﾉ撰ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ
         # ライントレース
-        turn = pid_control(threshold,$color.reflect)
+        turn = pid_control($color.reflect,threshold)
 
         #--------------------------------------------------??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ]??ｿｽ?ｿｽﾊゑｿｽ??ｿｽ?ｿｽﾆゑｿｽPID??ｿｽ?ｿｽﾆ托ｿｽ??ｿｽ?ｿｽx
         motor_w_count = $motor_l.count + $motor_r.count
@@ -638,11 +661,12 @@ pidflag = -1 #kobayashi
           flag = next_flag if motor_w_count - obstacle_end > 2700
         end
 
-
+distance = $sonar.distance #kobayashi
         tail_control(tail)
 
 #------------------------------ここからゲート------------------------------------------------------------------------
-	if pidflag == 6 && distance <= 25 && distance > 0 #ゲートに近づいたとき
+	#if pidflag == 6 && distance <= 25 && distance > 0 #ゲートに近づいたとき
+	if iremono[pidchange][8] < motor_w_count > 0 && motor_w_count <= 33000  #kobayashi
 			
 			left_m = 1
 			right_m = 1
