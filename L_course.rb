@@ -37,19 +37,20 @@ KD = 0.23	#微分ゲイン初期値
 iremono = [
   #0.21
 # => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]	-：黒寄り
-    [    0, 1, 1,0.126,0.162, 0.04, 100,  0, 3], # pid0
-    [ 1000, 1, 1,0.126,0.162, 0.04, 100,  0, 3], # pid1(1st_straight)
-    [ 6000, 1, 1,0.996,0.139,0.034,  60, -3,  0], # pid2(1carb)
-    [ 10000, 1, 1,0.996,0.139,0.034,  75, -3,  0], # pid3(1carb)
-    [ 13000, 1, 1,0.126,0.162, 0.04, 75,  12,  1], # pid4(2st_straight)
-    [14000, 1, 1, 0.696,0.225,0.056,  100,  0, -1], # pid5(2carb_mid)
-    [19000, 1, 1, 0.696,0.176,0.044,  60, 3,  -1], # pid6(2carb_2)
-		[20000, 1, 1, 0.996,0.176,0.044,  60, 3,  -1], #pid7
-    [24500, 1, 1,0.2,0.162, 0.034,  100,  3,  1], #pid8(3st_straight)
-    [26000, 1, 1,0.2,0.162, 0.034, 100,  3,  1], # pid9(3st_straight)
-    [28000, 1, 1, 0.996, 0.17,0.042,  60,  3,  -2], # pid10(3carb)
-    [30000, 1, 1,0.126,0.162, 0.04,  50, -3,  -2], # pid11(4st_straight_goal)
-    [99999, 1, 1,0.126,0.162, 0.04,  50,  -3,  -2], # 4st_straight
+    [    0, 1, 1,0.126,0.162, 0.04, 100,  0, 0], # pid0
+    [ 1000, 1, 1,0.106,0.162, 0.04, 100,  3, 1], # pid1(1st_straight)
+    [ 6000, 1, 1,0.696,0.186,0.034,  100, 1,  -3], # pid2(1carb)
+    [ 10000, 1, 1,0.696,0.186,0.034,  100, 1,  -3], # pid3(1carb)
+    [ 12000, 1, 1,0.106,0.182, 0.04, 100,  4,  -2], # pid4(2st_straight)
+    [14600, 1, 1, 0.596,0.225,0.056,  100,  3, -2], # pid5(2carb_mid)
+    [19000, 1, 1, 0.596,0.196,0.044,  100, 1,  -3], # pid6(2carb_2)
+	[21000, 1.1, 1, 0.896,0.16,0.044,  100, -6, -3], #pid7
+    [23500, 1, 1,0.2,0.162, 0.034,  100,  0, 0], #pid8(3st_straight)
+    [29000, 1, 1,0.2,0.162, 0.034, 60,  0,  0], # pid9(3carb)
+	[31000, 1, 1,0.126,0.162, 0.04, 40,  0, -2], #pid10(dansa)
+   # [35000, 1, 1, 0.996, 0.17,0.042,  60,  3,  -5], # pid10(3carb)
+   # [40000, 1, 1,0.126,0.162, 0.04,  50, -3,  -5], # pid11(4st_straight_goal)
+   # [99999, 1, 1,0.126,0.162, 0.04,  50,  -3,  -5], # 4st_straight
     [999999] #end
 ]
 
@@ -244,7 +245,7 @@ begin
         start = RTOS.msec
         g = $gyro.rate.to_f
         tail_control(TAIL_ANGLE_STAND_UP + tc)
-        puts "g = #{g}"
+        #puts "g = #{g}"
         # puts "tc = #{tc}"
         break if g >= 1   #65
         #RTOS.delay(10)
@@ -254,6 +255,9 @@ begin
 
 
     Speaker.volume = 2
+	d_cnt = 0
+	flag_cnt = 0
+	d_flag = 0
     loop{
         start = RTOS.msec
         # ??ｿｽ?ｿｽo??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽX??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽs??ｿｽ?ｿｽp??ｿｽ?ｿｽp??ｿｽ?ｿｽx??ｿｽ?ｿｽﾉ撰ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ
@@ -290,7 +294,7 @@ begin
             pidchange += 1
             if pidchange >= iremono.size - 1
               flag = 2
-              print "pidchange:",pidchange,">>sakimae\n"
+              #print "pidchange:",pidchange,">>sakimae\n"
             end
         end
 
@@ -379,7 +383,69 @@ begin
           RTOS.delay(10000)
 
 
+#---------------------段差ココ！----------------------------------------
 
+        g = $gyro.rate.to_f
+        #100回ループ中にg+-50行かなかったらスタート
+        if d_flag==0 && (g >= -50 && g <= 50)
+         	d_cnt += 1
+        elsif d_flag==0
+        	d_cnt = 0
+        end
+				if d_flag==0 && (d_cnt >= 400) #スタート
+        			d_flag = 1
+							puts "aaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        	    Speaker.tone(:c5, 200)
+        	    d_cnt = 0
+				end
+        if d_flag==1 && (g < -80 || g > 80)	#段差検知
+        	d_flag = 2
+						puts "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+					  flag_cnt = 0
+						#gyro_offset = 5
+        	  Speaker.tone(:d5, 200)
+        	  	flag_cnt = $motor_l.count + $motor_r.count
+        end
+        if d_flag == 2	#段差乗り越えカウント
+						if motor_w_count > flag_cnt + 1500
+							i = 30
+        	  Speaker.tone(:d5, 200)
+						elsif motor_w_count > flag_cnt + 1400
+        	  	Speaker.tone(:f4, 200)
+							turn = -60
+							i = 10
+						elsif motor_w_count > flag_cnt + 800
+        	  	Speaker.tone(:c5, 200)
+							i = 10
+
+						else
+	        	  Speaker.tone(:d4, 200)
+						end
+        end
+
+	        pwm_l, pwm_r = Balancer.control(
+	        i,
+	        turn,
+	        g,
+	        gyro_offset,
+	        $motor_l.count.to_f,
+	        $motor_r.count.to_f,
+	        Battery.mV.to_f)
+
+        $motor_l.stop(true) if pwm_l == 0
+        $motor_l.power = pwm_l * lm
+        $motor_r.stop(true) if pwm_r == 0
+        $motor_r.power = pwm_r * rm
+
+        if pwm_l + pwm_r == 200 || pwm_l + pwm_r == -200
+            a << [$motor_l.count,$motor_r.count] if c == 0
+            c=c+1
+            break if c == 250
+        else
+            c = 0
+        end
+
+#-----------------------------------------------------------------------
 
 
         when 100 # flag 100 : tail drive start : tail overwrite
@@ -576,9 +642,6 @@ begin
 
 
         tail_control(tail)
-
-#-----------------------------------------------------------------------
-
 
         # ??ｿｽ?ｿｽ|??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽU??ｿｽ?ｿｽq??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽAPI??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾄび出??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽA??ｿｽ?ｿｽ|??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽs??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ驍ｽ??ｿｽ?ｿｽﾟゑｿｽ
         # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽE??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ[??ｿｽ?ｿｽ^??ｿｽ?ｿｽo??ｿｽ?ｿｽﾍ値??ｿｽ?ｿｽ??ｿｽ?ｿｽ?ｿｽ */
