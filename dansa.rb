@@ -326,6 +326,7 @@ begin
             pidchange += 1
             if pidchange >= iremono.size - 1
               flag = 2
+<<<<<<< HEAD
               print "pidchange:",pidchange,">>sakimae\n"
             end
         end
@@ -348,6 +349,12 @@ i = 20
 		end
 		#end
 =end
+=======
+              #print "pidchange:",pidchange,">>sakimae\n"
+            end
+        end
+i = 20
+>>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
 
         g = $gyro.rate.to_f
         #100回ループ中にg+-50行かなかったらスタート
@@ -386,6 +393,7 @@ i = 20
 	        	  Speaker.tone(:d4, 200)
 						end
         end
+<<<<<<< HEAD
 =begin
         if flag==2 && (g >= -80 && g <= 80)	#段差乗り越えカウント
          cnt += 1
@@ -418,6 +426,8 @@ i = 20
         gy<<g
 =end
 #				if dansa_f != 2
+=======
+>>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
 
 	        pwm_l, pwm_r = Balancer.control(
 	        i,
@@ -427,6 +437,7 @@ i = 20
 	        $motor_l.count.to_f,
 	        $motor_r.count.to_f,
 	        Battery.mV.to_f)
+<<<<<<< HEAD
 =begin
 				else
 					p [col, threshold - 10]
@@ -439,11 +450,18 @@ i = 20
 					end
 				end
 =end
+=======
+
+>>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
         $motor_l.stop(true) if pwm_l == 0
         $motor_l.power = pwm_l * lm
         $motor_r.stop(true) if pwm_r == 0
         $motor_r.power = pwm_r * rm
+<<<<<<< HEAD
 #            a << [g,pwm_l, pwm_r,wait,$color.reflect, threshold]
+=======
+
+>>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
         if pwm_l + pwm_r == 200 || pwm_l + pwm_r == -200
             a << [$motor_l.count,$motor_r.count] if c == 0
             c=c+1
