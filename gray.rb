@@ -17,19 +17,10 @@ RIGHT_MOTOR  = :port_b
 LEFT_MOTOR   = :port_c
 
 #灰色探知用
-<<<<<<< HEAD
-GRAY_VALUE = 20
-G_TH = 6
-W_TH = 4
-=begin
-GRAY_RANGE = 7 #探索範囲
+GRAY_RANGE = 10 #探索範囲
 gray_arr = []
-=end
-=======
-GRAY_RANGE = 30 #探索範囲
-gray_arr = []
+gray_arr2 = []
 
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
 class Array
   # 要素をto_iした値の平均を算出する
   def avg
@@ -38,16 +29,11 @@ class Array
   # 要素をto_iした値の分散を算出する
   def variance
     a = avg
-<<<<<<< HEAD
     inject(0.0){|r,i| r+=(i.to_i-a)**2 }/size
   end
 	def standard
 		variance**(1/2.0)
 	end
-=======
-    b = inject(0.0){|r,i| r+=(i.to_i-a)**2 }/size
-  end
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
 end
 
 #??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽL??ｿｽ?ｿｽﾌ定数??ｿｽ?ｿｽl??ｿｽ?ｿｽﾍ個托ｿｽ/??ｿｽ?ｿｽﾂ具ｿｽ??ｿｽ?ｿｽﾉ搾ｿｽ??ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽ??ｿｽ?ｿｽﾄ変更??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽK??ｿｽ?ｿｽv??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾜゑｿｽ
@@ -71,12 +57,8 @@ KD = 0.23	#微分ゲイン初期値
 iremono = [
   #0.21
 # => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]	-：黒寄り
-<<<<<<< HEAD
     [    0, 1, 1,1,0.162, 0.04, 20,  0, 1], # pid0
-=======
-    [    0, 1, 1,0.126,0.162, 0.04, 20,  0, 1], # pid0
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
-    [ 1000, 1, 1,0.126,0.162, 0.04, 20,  0, 1], # pid1(1st_straight)
+#    [ 1000, 1, 1,1,0.162, 0.04, 20,  -2, 1], # pid1(1st_straight)
     [999999, 1, 1,0.996,0.139,0.034,  20, 0,  1], # pid2(1carb)
     [ 10000, 1, 1,0.996,0.139,0.034,  75, -3,  2], # pid3(1carb)
     [ 13000, 1, 1,0.126,0.162, 0.04, 75,  10,  1], # pid4(2st_straight)
@@ -233,13 +215,6 @@ begin
         RTOS.delay(1000)
     $white_value = color_calibration
     puts "white::#{$white_value}"
-<<<<<<< HEAD
-		RTOS.delay(1000)
-    $gray_value = color_calibration
-		$gray_value = (($gray_value * G_TH + $white_value * W_TH )/(G_TH+W_TH)).to_i
-    puts "gray::#{$gray_value}"
-=======
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
     c = 0
     threshold = (($black_value + $white_value) / 2).round
     puts "black:#{$black_value},white:#{$white_value}"
@@ -311,12 +286,11 @@ begin
     Speaker.volume = 2
 
 		
-<<<<<<< HEAD
-	graph = []
+		graph = []
+		
+		gmr = $motor_r.count
+		gml = $motor_l.count
 
-=======
-	
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
     loop{
         start = RTOS.msec
 		tail_control(TAIL_ANGLE_DRIVE)
@@ -356,22 +330,46 @@ begin
             end
         end
 
-<<<<<<< HEAD
 				#p $color.reflect
 
 				#灰色探知
-				print $color.reflect
-				$color.reflect.times do |i|
-					print "*"
-				end
-				puts
+				gc = -1
+				gmrc = $motor_r.count - gmr
+				gmlc = $motor_l.count - gml
 
-				if $color.reflect >= $gray_value && $color.reflect < $white_value
-					Speaker.tone(:f4, 200)
+				
+				
+				if gmrc>gmlc
+					gc = (gmrc - gmlc)
+				elsif gmrc<gmlc
+					gc = gmlc - gmrc
+				else
+					gc = 0
 				end
+				gray_arr << gc
+				gray_arr2 << $color.reflect
 
-#				gray_arr << $color.reflect
-				graph << $color.reflect
+				if gray_arr.length >= GRAY_RANGE
+					mcs= (gray_arr.standard * 100).to_i
+					print "mcs :#{mcs}"
+					graph << mcs
+					cs = (gray_arr2.standard * 100).to_i
+					puts "/cs :#{cs}"
+					
+					ser = 0
+					if cs < mcs
+						ser = mcs - cs
+					end
+					puts "/ser:#{ser}"
+					if ser > 50
+						Speaker.tone(:f4, 200)
+					end
+					gray_arr.clear
+					gray_arr2.clear
+				end
+				gmr = $motor_r.count
+				gml = $motor_l.count
+				
 =begin
 				if gray_arr.length >= GRAY_RANGE
 					min = gray_arr[0]
@@ -391,25 +389,6 @@ begin
 				end
 				#end
 =end
-=======
-		#p $color.reflect
-
-		#灰色探知
-		gray_arr << $color.reflect
-
-		if gray_arr.length >= GRAY_RANGE
-			av = gray_arr.avg
-			gray_arr2 = []
-			gray_arr.length.times do |i|
-				gray_arr2[i] = ( av - gray_arr[i] ).abs
-			end
-			p gray_arr2.avg
-
-			gray_arr.clear
-		end
-		#end
-
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
         g = $gyro.rate.to_f
         pwm_l, pwm_r = Balancer.control(
         forward+i,
@@ -446,14 +425,7 @@ begin
     a.each do |b|
         puts b
     end
-<<<<<<< HEAD
-		p graph
-		puts "black::#{$black_value}"
-		puts "white::#{$white_value}"
-		puts "gray::#{$gray_value}"
-=======
-
->>>>>>> 060ae1637f2d281106f4bae623fbf17be224c020
+	p graph
 rescue => e
     LCD.error_puts e
 end
