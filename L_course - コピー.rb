@@ -1,13 +1,12 @@
-
 #####################################################################################
 #
-#     Rコース用
+#     Lコース用
 #
 #####################################################################################
 
 include EV3RT_TECS
 
-# ポート番号の設定
+#センサー・モーターのポート設定
 TOUCH_SENSOR = :port_1
 COLOR_SENSOR = :port_3
 GYRO_SENSOR  = :port_4
@@ -18,57 +17,39 @@ RIGHT_MOTOR  = :port_b
 LEFT_MOTOR   = :port_c
 
 #??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽL??ｿｽ?ｿｽﾌ定数??ｿｽ?ｿｽl??ｿｽ?ｿｽﾍ個托ｿｽ/??ｿｽ?ｿｽﾂ具ｿｽ??ｿｽ?ｿｽﾉ搾ｿｽ??ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽ??ｿｽ?ｿｽﾄ変更??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽK??ｿｽ?ｿｽv??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾜゑｿｽ
-gyro_offset = 1       # ??ｿｽ?ｿｽW??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽC??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽZ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽT??ｿｽ?ｿｽI??ｿｽ?ｿｽt??ｿｽ?ｿｽZ??ｿｽ?ｿｽb??ｿｽ?ｿｽg??ｿｽ?ｿｽl(??ｿｽ?ｿｽp??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽx0[deg/sec]??ｿｽ?ｿｽ??ｿｽ?ｿｽ)
-SONAR_ALERT_DISTANCE = 30 # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽg??ｿｽ?ｿｽZ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽT??ｿｽ?ｿｽﾉゑｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽQ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽm??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ[cm]
-TAIL_ANGLE_STAND_UP = 91  # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽS??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ~??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾌ角??ｿｽ?ｿｽx[??ｿｽ?ｿｽx]
-TAIL_ANGLE_DRIVE = 3      # ??ｿｽ?ｿｽo??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽX??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽs??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾌ角??ｿｽ?ｿｽx[??ｿｽ?ｿｽx]
-TAIL_ANGLE_TAIL_DRIVE = 75 #tail drive
-P_GAIN = 1.5              # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽS??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ~??ｿｽ?ｿｽp??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ[??ｿｽ?ｿｽ^??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽW??ｿｽ?ｿｽ??ｿｽ?ｿｽ
+gyro_offset = 1		  #ロボット(固有名)のジャイロセンサー固有基礎設定値
+SONAR_ALERT_DISTANCE = 30 #ソナーアラート値[cm]
+TAIL_ANGLE_STAND_UP = 91  #ロボットを立った状態にするためのテールの角度の初期値[x]
+TAIL_ANGLE_DRIVE = 3      #[x]
+TAIL_ANGLE_TAIL_DRIVE = 75 #tail_drive
+P_GAIN = 1.5              # ??ｿｽ?ｿ?ｽ?ｿｽ?ｿｽ??ｿｽ?ｿｽS??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ~??ｿｽ?ｿｽp??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ[??ｿｽ?ｿｽ^??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽW??ｿｽ?ｿｽ??ｿｽ?ｿｽ
 PWM_ABS_MAX = 60          # ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽS??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ~??ｿｽ?ｿｽp??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ[??ｿｽ?ｿｽ^??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽPWM??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽﾎ最托ｿｽ??ｿｽ?ｿｽl
 
 
 # PID制御に関わる定数をセット
 # 周期を設定
 PERIOD = 0.004
-
-KP = 1.7
-KI = 0
-KD = 0.23
+#PDI制御(フィードバック制御)初期値
+KP = 1.7	#比例ゲイン初期値
+KI = 0		#積分ゲイン初期値
+KD = 0.23	#微分ゲイン初期値
 
 iremono = [
   #0.21
-# => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]
-    [    0, 1, 1,0.126,0.162, 0.04, 100,  0,  -3], # 1streat
-    [ 1000, 1, 1,0.126,0.162, 0.04, 100,  0,  -3], # 1streat
-=begin
-    [ 6000, 1, 1,0.996,0.176,0.044,  100, 7,  -5], # 1carb
-    #[ 15200, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 2streat
-    [15500, 1, 1,0.996,0.176, 0.044,  80,  -6,  -7], # 2carb
-    [20000, 1, 1,  0.996,0.176,0.044,  70, 0,  -7], # 2carb_1
-    [24000, 1, 1, 0.126,0.162,0.04,  100,  0,  -3], # 2streat
-    [29600, 1, 1, 0.996,0.176,0.044,  50, -5,  -5], # 3carb
-    [33000, 1, 1,0.126,0.162, 0.04,  25, 0,  -5], # gate
-   # [45000, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 3streat
-    # [15100, 1, 1,0.126,0.162, 0.04, 100,  5,  4], # test_3streat_start
-    # [16000, 1, 1,0.126,0.162, 0.04, 100,  5,  8], # test_3streat
-   # [38000, 1, 1, 0.126, 0.17,0.042,  100,  3,  -5], # 3carb
-=end
-    [ 6000, 1, 1,0.996,0.176,0.044,  95, -5,  -5], # 1carb
-    #[ 15200, 1, 1,0.126,0.162, 0.04, 100,  0,  -5], # 2streat
-    [15500, 1, 1,0.996,0.176, 0.044,  80,  -5,  -7], # 2streat
-    [20000, 1, 1,  0.996,0.176,0.044,  70, 5,  -7], # 2carb_1
-    [24000, 1, 1, 0.126,0.162,0.04,  100,  2,  -3], # 2carb_mid
-    [29600, 1, 1, 0.996,0.176,0.044,  50, 0,  -5], # 2carb_2
-    [33000, 1, 1,0.126,0.162, 0.04,  25, 0,  -5], # 3streat
-   # [45000, 1, 1,0.126,0.162, 0.04, 100,  5,  -5], # 3streat
-    # [15100, 1, 1,0.126,0.162, 0.04, 100,  5,  4], # test_3streat_start
-    # [16000, 1, 1,0.126,0.162, 0.04, 100,  5,  8], # test_3streat
-    [38000, 1, 1, 0.126, 0.17,0.042,  100,  3,  -5], # 3carb
-
-    # [18600, 1, 1,  1.7,    1, 0.22,  50,  3,  0], # 3carb_old
-    #[47000, 1, 1,0.126,0.162, 0.04,  100, -3,  -5], # 4streat_goal
-    #[49000, 1, 1,0.126,0.162, 0.04,  100,  0,  -5], # 4streat
-    # [22000, 1, 1,  1.7,    0,    0,  15, -3,  0], # 4streat_old
+# => [motor_w_count,lm,rm,KP,KI,KD,i,threshold,gyro_offset]	-：黒寄り
+    [    0, 1, 1,0.126,0.162, 0.04, 100,  0, 5], # pid0
+    [ 1000, 1, 1,0.106,0.162, 0.04, 100,  3, 6], # pid1(1st_straight)
+    [ 6000, 1, 1,0.696,0.186,0.034,  100, 1,  2], # pid2(1carb)
+    [ 10000, 1, 1,0.696,0.186,0.034,  100, 1,  2], # pid3(1carb)
+    [ 12000, 1, 1,0.106,0.182, 0.04, 100,  4,  3], # pid4(2st_straight)
+    [14600, 1, 1, 0.596,0.225,0.056,  100,  3, 3], # pid5(2carb_mid)
+    [19000, 1, 1, 0.596,0.196,0.044,  100, 1,  2], # pid6(2carb_2)
+		[21000, 1.1, 1, 0.896,0.16,0.044,  100, -6, 2], #pid7
+    [23500, 1, 1,0.2,0.162, 0.034,  100,  0, 5], #pid8(3st_straight)
+    [29000, 1, 1,0.2,0.162, 0.034, 60,  0,  5], # pid9(3carb)
+   # [35000, 1, 1, 0.996, 0.17,0.042,  60,  3,  -5], # pid10(3carb)
+   # [40000, 1, 1,0.126,0.162, 0.04,  50, -3,  -5], # pid11(4st_straight_goal)
+   # [99999, 1, 1,0.126,0.162, 0.04,  50,  -3,  -5], # 4st_straight
     [999999] #end
 ]
 
@@ -91,7 +72,7 @@ def color_calibration(n=10)
     Speaker.tone(:a5, 200)
     RTOS.delay(500)
     col
-    
+
 end
 #*****************************************************************************
 # 走行体完全停止用モータの角度制御
@@ -110,7 +91,8 @@ def pid_control(target_val,sensor_val )
 
     $diff[0] = $diff[1]
     $diff[1] = sensor_val - target_val
-    $integral += (($diff[1] || 0 ) + ($diff[0] || 0)) / 2.0 * PERIOD
+    $integral += (($diff[1
+] || 0 ) + ($diff[0] || 0)) / 2.0 * PERIOD
 
     prp = KP * $diff[1]
     ing = KI * $integral
@@ -138,9 +120,9 @@ end
 #*****************************************************************************
 def pidcash_reset
     Speaker.tone(:c4, 400)
-    #$diff[0] = 0
-    #$diff[1] = 0
-    #$integral = 0
+    $diff[0] = 0
+    $diff[1] = 0
+    $integral = 0
 end
 #mainプログラム
 begin
@@ -151,7 +133,7 @@ begin
     LCD.puts "--- mruby version ---"
     Speaker.volume = 1
     # 各オブジェクトを生成・初期化する
-    $sonar = UltrasonicSensor.new(SONAR_SENSOR)
+  #  $sonar = UltrasonicSensor.new(SONAR_SENSOR)
     $color = ColorSensor.new(COLOR_SENSOR)
     $color.reflect
     $touch = TouchSensor.new(TOUCH_SENSOR)
@@ -174,9 +156,7 @@ begin
     tail_plus = 0
     flag = 0
     pidchange = 0
-pidflag = -1 #kobayashi
-distance = 1 #kobayashi
-gate_c = 0 #kobayashi
+
     lap = 0
     lap_diff = 0
     lap_start = 0
@@ -218,11 +198,11 @@ gate_c = 0 #kobayashi
     c = 0
     threshold = (($black_value + $white_value) / 2).round
     puts "black:#{$black_value},white:#{$white_value}"
-########尻尾調整ですｗ######################################################
-
+        RTOS.delay(1000)
     $motor_t.reset_count
 
     # ??ｿｽ?ｿｽX??ｿｽ?ｿｽ^??ｿｽ?ｿｽ[??ｿｽ?ｿｽg??ｿｽ?ｿｽﾒ機
+    LCD.puts "Ready to start"
     loop {
         # 完全停止用角度に制御
         tail_control(TAIL_ANGLE_STAND_UP + 3)
@@ -237,73 +217,11 @@ gate_c = 0 #kobayashi
             puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
             RTOS.delay(200)
         end
-	# タッチセンサが押されるまで待つ
-        break if $touch.pressed?
-        RTOS.delay(10)
-    }
-
-		TAIL_ANGLE_DRIVE = TAIL_ANGLE_STAND_UP - 88 
-    gate_tail_stand_up = TAIL_ANGLE_STAND_UP - 27 #ゲートをくぐる角度なんじゃ
-#    gate_tail_stand_up = TAIL_ANGLE_STAND_UP - 22 #ゲートをくぐる角度なんじゃ
-    RTOS.delay(500)
-    Speaker.tone(:a4, 200)
-########ゲートをくぐるときのカラー#####################################################
-    #$motor_t.rotate(58, 20, true)
-		
-    loop {
-    		tail_control(gate_tail_stand_up)
-        break if $touch.pressed?
-        RTOS.delay(10)
-    }
-    tail_black  = $color.reflect
-    puts "tail_black = #{tail_black}"
-    Speaker.tone(:a4, 200)
-    RTOS.delay(500)
-
-    loop {
-    		tail_control(gate_tail_stand_up)
-        break if $touch.pressed?
-        RTOS.delay(10)
-    }
-    tail_white  = $color.reflect
-    puts "tail_white = #{tail_white}"
-    Speaker.tone(:a4, 200)
-    RTOS.delay(500)
-
-		
-    loop {
-    		tail_control(TAIL_ANGLE_DRIVE)
-        # タッチセンサが押されるまで待つ
-        break if $touch.pressed?
-        RTOS.delay(10)
-    }
-    Speaker.tone(:a4, 200)
-    RTOS.delay(500)
-
-    # スタート待機
-    LCD.puts "Ready to start"
-    loop {
-        # 完全停止用角度に制御
-
-        tail_control(TAIL_ANGLE_STAND_UP)
-=begin
-        #TAIL微調整
-        if Button[:up  ].pressed?
-            TAIL_ANGLE_STAND_UP += 1
-            puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
-            RTOS.delay(200)
-        end
-        if Button[:down].pressed?
-            TAIL_ANGLE_STAND_UP -= 1
-            puts "TAIL_ANGLE_STAND_UP:#{TAIL_ANGLE_STAND_UP}"
-            RTOS.delay(200)
-        end
-=end
         eeee = $color.reflect
         if (threshold - 3 < eeee) && (threshold + 3 > eeee)
           Speaker.tone(:e4, 200)
         end
-        # タッチセンサが押されるまで待つ
+	# タッチセンサが押されるまで待つ
         break if $touch.pressed?
         RTOS.delay(10)
     }
@@ -321,12 +239,12 @@ gate_c = 0 #kobayashi
     # LED:緑 走行状態
     LED.color = :green
 
-=begin
+
     loop {
         start = RTOS.msec
         g = $gyro.rate.to_f
         tail_control(TAIL_ANGLE_STAND_UP + tc)
-        puts "g = #{g}"
+        #puts "g = #{g}"
         # puts "tc = #{tc}"
         break if g >= 1   #65
         #RTOS.delay(10)
@@ -334,48 +252,13 @@ gate_c = 0 #kobayashi
         RTOS.delay(wait) if wait > 0
     }
 
-=end
-=begin
-	loop {
-    	ss_flg = 0
-	    loop {
-	        start = RTOS.msec
-	        g = $gyro.rate.to_f
-	        if g < 0
-	        	ss_flg += 1
-	        	tc+=1
-	        end
-	        tail_control(TAIL_ANGLE_STAND_UP + tc)
-	        puts "g = #{g}"
-	        puts "tc = #{tc}"
-	        ss_flg = 10 if g >= 8 #65
-	        break if ss_flg >= 10 #65
 
-	        #RTOS.delay(10)
-	        wait = 4 - (RTOS.msec - start)
-	        RTOS.delay(wait) if wait > 0
-	    	}
-	        break if ss_flg >= 10 #65
-	    }
-=end
-    loop {
-        start = RTOS.msec
-        g = $gyro.rate.to_f
-        tail_control(TAIL_ANGLE_STAND_UP + tc)
-        puts "g = #{g}"
-        # puts "tc = #{tc}"
-        break if g >= 1   #65
-        #RTOS.delay(10)
-        wait = 4 - (RTOS.msec - start)
-        RTOS.delay(wait) if wait > 0
-    }
-
-    Speaker.volume = 20
+    Speaker.volume = 2
     loop{
         start = RTOS.msec
         # ??ｿｽ?ｿｽo??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽX??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽs??ｿｽ?ｿｽp??ｿｽ?ｿｽp??ｿｽ?ｿｽx??ｿｽ?ｿｽﾉ撰ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ
         # ライントレース
-        turn = pid_control($color.reflect,threshold)
+        turn = pid_control(threshold,$color.reflect)
 
         #--------------------------------------------------??ｿｽ?ｿｽ??ｿｽ?ｿｽ??ｿｽ?ｿｽ]??ｿｽ?ｿｽﾊゑｿｽ??ｿｽ?ｿｽﾆゑｿｽPID??ｿｽ?ｿｽﾆ托ｿｽ??ｿｽ?ｿｽx
         motor_w_count = $motor_l.count + $motor_r.count
@@ -393,7 +276,7 @@ gate_c = 0 #kobayashi
             lap_diff = RTOS.msec - lap_start - lap
             lap = RTOS.msec - lap_start
             puts "pid:#{pidchange}\t#{lap}ms\t#{lap_diff}ms"
-          	Speaker.tone(:e5, 200)
+          	Speaker.tone(:f4, 200)
             pidcash_reset()
             lm = iremono[pidchange][1]
             rm = iremono[pidchange][2]
@@ -405,10 +288,10 @@ gate_c = 0 #kobayashi
             gyro_offset = iremono[pidchange][8]
 
             pidchange += 1
-            #if pidchange >= iremono.size - 1
-             # flag = 2
-             # print "pidchange:",pidchange,">>sakimae\n"
-           # end
+            if pidchange >= iremono.size - 1
+              flag = 2
+              #print "pidchange:",pidchange,">>sakimae\n"
+            end
         end
 
         case flag
@@ -672,7 +555,7 @@ gate_c = 0 #kobayashi
             tail_control(40+tc)
             tc += 2 if cnt % 100 == 0
             cnt += 1
-            break if tc > 20 + ( TAIL_ANGLE_STAND_UP - 91 ) && g > 30 #30
+            break if tc > 20 + ( TAIL_ANGLE_STAND_UP - 91 )&& g > 30 #30
             wait = 4 - (RTOS.msec - start)
             RTOS.delay(wait) if wait > 0
           }
@@ -691,221 +574,8 @@ gate_c = 0 #kobayashi
           flag = next_flag if motor_w_count - obstacle_end > 2700
         end
 
-distance = $sonar.distance #kobayashi
+
         tail_control(tail)
-
-#------------------------------ここからゲート------------------------------------------------------------------------
-	#if pidflag == 6 && distance <= 25 && distance > 0 #ゲートに近づいたとき
-	if iremono[pidchange][8] < motor_w_count && motor_w_count >= 33000  #kobayashi
-			
-			left_m = 1
-			right_m = 1
-
-			lap_diff = RTOS.msec - lap_start - lap
-			lap = RTOS.msec - lap_start
-
-		KP = 0.3
-		KI = 0.1 
-		KD = 0.02
-
-  		speed = 6
-				
-      if distance <= 20 && distance > 0 #ゲートにめっちゃ近づいたとき
-          puts "in flag6"
-  			  pidflag = 7
-					puts "start_motor = #{$motor_t.count}"
-					mtc = $motor_t.count
-					Speaker.tone(:e4, 400)
-							
-					$motor_r.rotate(60, 10, false)
-					$motor_l.rotate(60, 10, false)
-					#$motor_t.rotate(58, 15, true)
-					$motor_t.rotate(70, 15, true)#65-10
-					RTOS.delay(1000)
-					$motor_t.rotate(-6, 15, true)#2段階で尻尾を下げ
-					RTOS.delay(1000)
-					$motor_t.rotate(-6, 15, true)#2段階で尻尾を下げ
-					RTOS.delay(1000)
-
-
-					puts "end_motor = #{$motor_t.count}"
-
-					loop{
-						$motor_t.rotate( gate_tail_stand_up - $motor_t.count , 3, false)
-						RTOS.delay(200)
-						$motor_r.rotate( 2, 35, false)
-						$motor_l.rotate( 2, 35, true) 
-						RTOS.delay(200)
-						$motor_r.rotate( -2, 35, false)
-						$motor_l.rotate( -2, 35, true) 
-						# puts "調整のtail_motor_count = #{$motor_t.count}"
-						break if $motor_t.count == gate_tail_stand_up
-					}
-
-					RTOS.delay(1000)
-
-					gate_motor_power_a = 1
-					gate_motor_power_b = 8
-					
-					tail_flag = 0
-					plus_rotate = 0
-					loop{
-							start = RTOS.msec
-							distance = $sonar.distance
-					
-							puts "color = #{$color.reflect}"
-							# puts "distance = #{distance}"
-							#puts "c = #{c}"
-							
-							if $color.reflect >= tail_white - 2  #白の時と白以外の時
-								$motor_l.power = gate_motor_power_a #2 -> 5 -> 2
-								$motor_r.power = gate_motor_power_b #5 -> 2 -> 5
-							else
-								$motor_l.power = gate_motor_power_b
-								$motor_r.power = gate_motor_power_a
-							end
-
-
-							if 	distance >= 130 && tail_flag == 0 #近くに行った後、ゲートをくぐったか確認する処理 現在130
-								c = c + 1
-	 						else
-								c = 0
-							end
-							
-							if distance <= 50 && distance > 0 && tail_flag == 1 
-								Speaker.tone(:a4, 200)
-								tail_flag = 0
-							end
-							
-							if c == 2500 #時間決め
-								$motor_l.stop
-								$motor_r.stop
-								RTOS.delay(1500)
-								
-								if gate_c == 2 #２回カウントしたらブレイク
-									$motor_l.reset_count
-									$motor_r.reset_count
-									Speaker.tone(:b4, 500)
-									c = 0
-        		  		break
-        		  	end
-
-=begin        		  						
-								$motor_l.power = -1
-								$motor_r.power = -1
-								$motor_t.rotate(10, 1, true) #回転するために機体を上げる処理
-								$motor_l.stop
-								$motor_r.stop
-=end
-								loop{
-									$motor_t.rotate( gate_tail_stand_up + 10 - $motor_t.count , 3, false)
-									$motor_r.rotate( -1, 40, false)
-									$motor_l.rotate( -1, 40, true) 
-									RTOS.delay(100)
-									$motor_r.rotate( 1, 40, false)
-									$motor_l.rotate( 1, 40, true) 
-									RTOS.delay(100)
-									# puts "調整のtail_motor_count = #{$motor_t.count}"
-									break if $motor_t.count == gate_tail_stand_up + 10
-								}
-								
-								
-								RTOS.delay(500)
-								$motor_l.rotate(330 + plus_rotate , 15, false)#反転する処理
-								$motor_r.rotate(-330 - plus_rotate , 15, true)
-								RTOS.delay(500)
-
-								plus_rotate  = 30
-
-								loop{
-									$motor_t.rotate( gate_tail_stand_up - $motor_t.count , 3, false)
-									$motor_r.rotate( -1, 40, false)
-									$motor_l.rotate( -1, 40, true) 
-									RTOS.delay(100)
-									$motor_r.rotate( 1, 40, false)
-									$motor_l.rotate( 1, 40, true) 
-									RTOS.delay(100)
-									puts "調整のtail_motor_count = #{$motor_t.count}"
-									break if $motor_t.count == gate_tail_stand_up  
-								}
-
-								RTOS.delay(1000)
-									
-								c = 0
-								
-								tail_flag = 1
-								gate_c = gate_c + 1
-
-								gate_motor_power_a , gate_motor_power_b = gate_motor_power_b , gate_motor_power_a 
-
-								puts "tail_white = #{tail_white}"
-							end
-
-    		  
-					}
-
-					parking_count = 1100 #ゲート終了からガレージまでの距離
-					stand_up_flag = 1
-
-					loop{ #最後の駐車場に行く処理
-						if $color.reflect >= tail_white - 2
-								$motor_l.power = gate_motor_power_a #2 -> 5 -> 2
-								$motor_r.power = gate_motor_power_b #5 -> 2 -> 5
-							else
-								$motor_l.power = gate_motor_power_b
-								$motor_r.power = gate_motor_power_a
-							end
-						
-						motor_w_count = $motor_l.count + $motor_r.count
-
-					
-						if motor_w_count >= parking_count
-							$motor_l.stop
-							$motor_r.stop
-        			
-        			
-
-							if stand_up_flag == 1
-=begin
-								$motor_l.power = -1
-								$motor_r.power = -1
-								$motor_t.rotate(10, 1, true) #回転するために機体を上げる処理
-								$motor_l.stop
-								$motor_r.stop
-=end
-								loop{
-									$motor_t.rotate( gate_tail_stand_up + 10 - $motor_t.count , 3, false)
-									$motor_r.rotate( -1, 35, false)
-									$motor_l.rotate( -1, 35, true) 
-									RTOS.delay(100)
-									$motor_r.rotate( 1, 35, false)
-									$motor_l.rotate( 1, 35, true) 
-									RTOS.delay(100)
-									puts "調整のtail_motor_count = #{$motor_t.count}"
-									break if $motor_t.count == gate_tail_stand_up + 10
-								}
-								stand_up_flag = 0
-							end
-							
-
-							RTOS.delay(6000)
-
-
-
-        			$motor_l.reset_count
-							$motor_r.reset_count
-        			parking_count = 100
-
-
-							break if $touch.pressed?
-
-						end
-					}
-					
-        end
-      #end
-
-end
 
 #-----------------------------------------------------------------------
 
