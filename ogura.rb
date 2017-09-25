@@ -492,7 +492,7 @@ begin
     turn = pid_control($color.reflect,threshold)
 
     motor_w_count = $motor_l.count + $motor_r.count
-    #モーター回転数が次ステップへ来たとき
+    #モーター回転数に対応する値を入れてく
     if iremono[pidchange][0] < motor_w_count #+ 15100
       lap_diff = RTOS.msec - lap_start - lap
       lap = RTOS.msec - lap_start
@@ -609,7 +609,7 @@ begin
       $motor_l.rotate(110,12,false)
       $motor_r.rotate(110,12,false)
       RTOS.delay(80)
-      $motor_t.rotate(TAIL_ANGLE_TAIL_DRIVE - 8,15,true)
+      $motor_t.rotate(TAIL_ANGLE_TAIL_DRIVE - 8,10,true)
       $motor_l.rotate(40,7,false)
       $motor_r.rotate(40,7,true)
       $motor_t.rotate(8,1,true)
@@ -621,10 +621,10 @@ begin
       flag = flag + 1
       puts "2 sec stop ..."
     when 201
-      i = 2
+      i = 3
       lap_diff = RTOS.msec - lap_start - lap
       flag = next_flag if lap_diff >= 1000
-
+#秒速用---とりあえずグラフから
     when 300 # flag 300..301 : search step : not tail overwrite
       gyro_offset = 3
       KP = 0.8
@@ -636,16 +636,53 @@ begin
       puts "search step sequence"
       sp = motor_w_count
       search_flag = 0
+      per_mseconds = []
+      step_serch_time = RTOS.msec
     when 301
       lap_diff = RTOS.msec - lap_start - lap
       if lap_diff > 200
+        per_mseconds << (now_m_count - motor_w_count) / (step_serch_time - RTOS.msec)
         lap = RTOS.msec - lap_start
+        #if sp - 30 > motor_w_count && search_flag == 1
+        #  pidcash_reset()
+        #  flag = next_flag
+        #  i = 0
+        #  step_point << sp
+        #end
+        #search_flag = 1 if sp + 30 < motor_w_count && search_flag == 0
+        #sp = motor_w_count
+      end
+      now_m_count = motor_w_count
+      step_serch_time = RTOS.msec
+    #lap_start:スタート
+    #start:毎回のループの開始
+    #lap:スタートしてから段差プログラムに入るまでかかった時間
+    #lap_diff:段差検知プログラム実行時間
+    #sp:開始前のモーター回転数
+    #search_flag:検知開始フラグ
+    when 305 # flag 305..306 : search step_2 : not tail overwrite
+      gyro_offset = 3
+      KP = 0.8
+      KI = 0.2
+      KD = 0.1
+      i = 12
+      lap = RTOS.msec - lap_start
+      flag = flag + 1
+      puts "search step sequence"
+      sp = motor_w_count
+      search_flag = 0
+    when 306
+      lap_diff = RTOS.msec - lap_start - lap#段差検知してる時間何秒？
+      if lap_diff > 200#0.2秒探した？
+        lap = RTOS.msec - lap_start
+        #モーターがあれから-30＆検知開始してる？
         if sp - 30 > motor_w_count && search_flag == 1
           pidcash_reset()
           flag = next_flag
           i = 0
           step_point << sp
         end
+        #モーターが開始から３０以上なら検知開始
         search_flag = 1 if sp + 30 < motor_w_count && search_flag == 0
         sp = motor_w_count
       end
@@ -835,6 +872,7 @@ begin
   $motor_r.stop(false)
   $motor_t.stop(false)
   puts RTOS.msec - lap_start
+  puts per_mseconds
   a.each do |b|
       puts b
   end
