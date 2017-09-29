@@ -518,98 +518,109 @@ begin
 
 ######なんかいっぱい書いてある…これって段差プログラムじゃね？ww################################
     #スタートからゴールまでは0しか使ってない( *´艸｀)
-    #flag:状態
+    #flag:状態（上の方で初期値セットするとこを２にすると段差プログラムに入るよ）
     #next_flag:小さい数字（1～２５かな？）をflagに入れるための入れ物
     #正直100以上は関数にすればいいのに…
     case flag
-    when 0  # start --> center goal
+    when 0  # スタートからゴールまではこれを使用
       tail = TAIL_ANGLE_DRIVE
-    when 1  # center goal --> obstacle
+    when 1  # ゴールから障害物まで（使用してない）
       gyro_offset = 2
       flag = 2 if motor_w_count > 1000
-    when 2  # call : search step
+    when 2  # 段差検知
       next_flag = flag + 1
       flag = 300
-    when 3  # call : back :argment back_point
+    when 3  # バック(back_point:バック距離)
       next_flag = flag + 1
       back_point = 300
       flag = 600
-    when 4  # call : go up step
+      #これでバックしない
+      #flag = next_flag
+    when 4  # 段差上がる
       next_flag = flag + 1
       flag = 400
-    when 5  # call : control traveling
+    when 5  # コントロール走行（ライン検知？？）
       next_flag = flag + 1
       flag = 500
-    when 6 # call : search step
+    when 6 # 段差検知
       next_flag = flag + 1
       flag = 300
-    when 7 # call : back
+    when 7 # バック
       back_point = 300
       next_flag = flag + 1
       flag = 600
-    when 8 # call : 2 sec stop
+      # これで１段目回転無し
+      # flag = 16
+    when 8 # 2秒ストップ
       next_flag = flag + 1
       flag = 200
-    when 9 # call : tail drive start
+    when 9 # テイルを下す
       next_flag = flag + 1
       flag = 100
-    when 10 # call : tail drive back
+    when 10 # テイル下した状態でバック
       next_flag = flag + 1
       flag = 800
       step_point_select = 1
-    when 11 # call : spin
+    when 11 # 回転
       next_flag = flag + 1
       flag = 700
-    when 12 # call : start
+    when 12 # ている上げる？
       next_flag = flag + 1
       flag = 900
-    when 13  # call : control traveling
+    when 13  # コントロール走行（ライン検知？？）
       step_point_select = 0
       next_flag = flag + 1
       flag = 500
-    when 14 # call : search step
+    when 14 # 段差検知
       next_flag = flag + 1
       flag = 300
-    when 15 #call : back
+    when 15 #バック
       next_flag = flag + 1
       flag = 600
       back_point = 300
-    when 16 # call : go up step
+    when 16 # 段差上がる
       next_flag = flag + 1
       flag = 400
-    when 17 # call : control traveling
+    when 17 # コントロール走行（ライン検知？？）
       step_point_select = 2
       next_flag = flag + 1
       flag = 500
-    when 18 # call : 2 sec stop
+      #これで２段目回転無し(下の２秒ストップのとこでもいいかも)
+      #flag = 21
+    when 18 # ２秒ストップ
       next_flag = flag + 1
       flag = 200
-    when 19 # call : tail drive start
+    when 19 # テイル下す
       next_flag = flag + 1
       flag = 100
-    when 20 # call : tail drive back
+    when 20 # テイル下したままバック
       next_flag = flag + 1
       flag = 800
-    when 21 # call : spin
+    when 21 # 回転
       next_flag = flag + 1
       flag = 700
-    when 22 # call : go down step
+    when 22 # 段差降りる
       next_flag = flag + 1
       flag = 1000
-    when 23 # call : winning run
+    when 23 # 車庫まで走る
       next_flag = flag + 1
       flag = 1100
-    when 24 # call : tail drive start
+    when 24 # テイル下す
       next_flag = flag + 1
       flag = 100
-    when 25
+    when 25　#　待ち
       RTOS.delay(10000)
     when 100 # flag 100 : tail drive start : tail overwrite
+      #tailは値が大きいほど下に下がる
+      #tailにテイル走行用の値を入れる（おそらく以下のプログラムで完全に降りているはずなので不要）
       tail = TAIL_ANGLE_TAIL_DRIVE
+      #ちょい前に進む
       $motor_l.rotate(110,12,false)
       $motor_r.rotate(110,12,false)
       RTOS.delay(80)
+      #そこそこテイルを下げる
       $motor_t.rotate(TAIL_ANGLE_TAIL_DRIVE - 8,10,true)
+      #前に進みながらゆっくり残りの８を下げる
       $motor_l.rotate(40,7,false)
       $motor_r.rotate(40,7,true)
       $motor_t.rotate(8,1,true)
@@ -623,8 +634,9 @@ begin
     when 201
       i = 3
       lap_diff = RTOS.msec - lap_start - lap
+      #今は1000msなので1秒の待ち
       flag = next_flag if lap_diff >= 1000
-#秒速用---とりあえずグラフから
+    #秒速用---とりあえずグラフから
     when 300 # flag 300..301 : search step : not tail overwrite
       gyro_offset = 3
       KP = 0.8
@@ -641,6 +653,7 @@ begin
     when 301
       lap_diff = RTOS.msec - lap_start - lap
       if lap_diff > 200
+        #per_msecondsに秒速が入る
         per_mseconds << (now_m_count - motor_w_count) / (step_serch_time - RTOS.msec)
         lap = RTOS.msec - lap_start
         #if sp - 30 > motor_w_count && search_flag == 1
@@ -654,13 +667,15 @@ begin
       end
       now_m_count = motor_w_count
       step_serch_time = RTOS.msec
+    #＝＝＝＝＝＝＝＝変数について＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
     #lap_start:スタート
     #start:毎回のループの開始
     #lap:スタートしてから段差プログラムに入るまでかかった時間
     #lap_diff:段差検知プログラム実行時間
     #sp:開始前のモーター回転数
     #search_flag:検知開始フラグ
-    when 305 # flag 305..306 : search step_2 : not tail overwrite
+    #＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+    when 305 # flag 305..306 : 従来の段差検知（モーター逆回転検知）
       gyro_offset = 3
       KP = 0.8
       KI = 0.2
@@ -694,6 +709,7 @@ begin
       i = 50
       puts "go up step sequence"
     when 401
+      #開始からモーターが180いったら（バックしない場合180じゃダメかも）
       if step_ex < motor_w_count
         flag = next_flag
         pidcash_reset()
@@ -704,6 +720,7 @@ begin
     when 500 #flag 500..501 : control traveling : not tail overwrite
       flag = flag + 1
       range = 60
+      #回転する位置
       spin_point = step_point[step_point_select] + 500
       puts "control traveling sequence"
       lap = RTOS.msec - lap_start
@@ -724,7 +741,7 @@ begin
         flag = next_flag
         pidcash_reset()
       end
-    when 600 #flag 600..601 : back : not tail overwrite
+    when 600 #バック
 
       flag = flag + 1
       gyro_offset = -4
@@ -736,14 +753,14 @@ begin
         flag = next_flag
         gyro_offset = 1
       end
-    when 700 #flag 700 : spin : not tail overwrite
+    when 700 #回転（720:360°,360:180°,180:90°）
       $motor_t.rotate(0,0,false)
       $motor_r.rotate(720,6,false)
       $motor_l.rotate(-720,6,true)
       RTOS.delay(4000)
       flag = next_flag
 
-    when 800 #flag 800 : tail drive back : not tail overwrite
+    when 800 #テイル下した状態でバック
       mov = -20
       mov = -100 if motor_w_count > step_point[step_point_select] - 200
       $motor_t.rotate(0,0,false)
@@ -751,7 +768,7 @@ begin
       $motor_l.rotate(mov,6,true)
       RTOS.delay(2000)
       flag = next_flag
-    when 900 #flag 900 : start : tail overwrite
+    when 900 #テイル上げてスタート
       tc = 0
       cnt = 0
       $motor_l.power = 30
